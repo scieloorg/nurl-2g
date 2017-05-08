@@ -1,6 +1,10 @@
 import string
 from random import randrange
 
+
+__all__ = ['generate_id', 'igenerate_id']
+
+
 BASE36 = string.digits + string.ascii_lowercase
 # sem vogais, para nao formar palavras em portugues
 # sem 1l0, para evitar confusões na leitura
@@ -19,12 +23,12 @@ def encode(n, digits):
         return digits[0]
 
 
-def generate(length, digits=BASE28):
+def generate_id(length, digits=BASE28):
     arbitrary_value = randrange(len(digits) ** length)
     return encode(arbitrary_value, digits).rjust(length, digits[0])
 
 
-def igenerate(length, digits=BASE28):
+def igenerate_id(length, digits=BASE28):
     while True:
-        yield generate(length, digits)
+        yield generate_id(length, digits)
 
