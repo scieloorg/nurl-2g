@@ -21,3 +21,4 @@ webassets==0.12.1
 yuicompressor==2.4.8
 zope.deprecation==4.2.0
 zope.interface==4.4.0
+pymongo==3.4.0

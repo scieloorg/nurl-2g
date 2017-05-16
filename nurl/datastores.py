@@ -1,8 +1,15 @@
 import abc
 import threading
+import logging
+
+import pymongo
 
 
-__all__ = ['InMemoryDataStore', 'DuplicatedKeyError', 'DuplicatedValueError']
+__all__ = ['InMemoryDataStore', 'DuplicatedKeyError', 'DuplicatedValueError',
+        'MongoDBDataStore']
+
+
+LOGGER = logging.getLogger(__name__)
 
 
 class DuplicatedKeyError(Exception):
@@ -60,4 +67,36 @@ class InMemoryDataStore(DataStore):
 
     def key(self, url):
         return self.revdata[url]
+
+
+class MongoDBDataStore(DataStore):
+    def __init__(self, collection):
+        self.collection = collection
+
+        self.collection.create_index('short_ref', unique=True)
+        self.collection.create_index('plain', unique=True)
+
+    def __setitem__(self, key, value):
+        record = {'plain': value, 'short_ref': key}
+        try:
+            _ = self.collection.insert_one(record)
+        except pymongo.errors.DuplicateKeyError as exc:
+            if 'plain' in str(exc):
+                raise DuplicatedValueError() from None
+            else:
+                raise DuplicatedKeyError() from None
+
+    def __getitem__(self, key):
+        record = self.collection.find_one({'short_ref': key})
+        if record is None:
+            raise KeyError()
+        else:
+            return record['plain']
+
+    def key(self, url):
+        record = self.collection.find_one({'plain': url})
+        if record is None:
+            raise KeyError()
+        else:
+            return record['short_ref']
 

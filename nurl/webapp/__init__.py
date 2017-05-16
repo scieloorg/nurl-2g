@@ -1,8 +1,12 @@
+import sys
+import logging
+
 from pyramid.config import Configurator
 from pyramid_beaker import set_cache_regions_from_settings
 from pyramid.renderers import JSONP
 from pyramid.events import NewRequest
 import webassets
+import pymongo
 
 from nurl import (
         base28,
@@ -10,6 +14,9 @@ from nurl import (
         trackers,
         shortener,
         )
+
+
+LOGGER = logging.getLogger(__name__)
 
 
 def main(global_config, **settings):
@@ -30,12 +37,25 @@ def main(global_config, **settings):
     # restful endpoints
     config.add_route('shortener_v1', '/api/v1/shorten')
 
+    # mongodb client
+    mongodb_uri = settings.get('mongodb.db_uri')
+    mongodb_name = settings.get('mongodb.db_name')
+    mongodb_coln = settings.get('mongodb.col_name')
+    if not all([mongodb_uri, mongodb_name, mongodb_coln]):
+        sys.exit('Missing MongoDB configuration')
+
+    mongodb_client = pymongo.MongoClient(mongodb_uri, appname='nURL')
+    mongodb_collection = mongodb_client[mongodb_name][mongodb_coln]
+    LOGGER.info('connected to MongoDB')
+
     # subscribers
     shortid_len = int(config.registry.settings.get('nurl.digit_count', 6))
     idgen = lambda: base28.igenerate_id(shortid_len)
     access_tracker = trackers.InMemoryTracker()
-    nurl = shortener.Nurl(datastores.InMemoryDataStore(), idgen,
-            tracker=access_tracker)
+    datastore = datastores.MongoDBDataStore(mongodb_collection)
+    nurl = shortener.Nurl(datastore, idgen, tracker=access_tracker)
+    LOGGER.debug('using the nURL instance "%s"', repr(nurl))
+
     config.registry.settings['nurl'] = nurl
     config.registry.settings['tracker'] = access_tracker
     config.add_subscriber(add_nurl, NewRequest)
