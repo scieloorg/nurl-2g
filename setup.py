@@ -7,8 +7,8 @@ import codecs
 import sys
 
 
-if sys.version_info[0:2] < (3, 3):
-    raise RuntimeError('Requires Python 3.3 or newer')
+if sys.version_info[0:2] < (3, 6):
+    raise RuntimeError('Requires Python 3.6')
 
 
 INSTALL_REQUIRES = [
@@ -16,6 +16,7 @@ INSTALL_REQUIRES = [
         'pyramid-chameleon >= 0.3',
         'pyramid-webassets >= 0.9',
         'yuicompressor >= 2.4.8',
+        'pymongo >= 3.4.0',
         ]
 TESTS_REQUIRE = []
 
@@ -38,11 +39,7 @@ setup(
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
-        "Programming Language :: Python :: 3.3",
-        "Programming Language :: Python :: 3.4",
-        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
-        "Topic :: Software Development :: Libraries :: Python Modules",
     ],
     tests_require=TESTS_REQUIRE,
     test_suite='tests',
