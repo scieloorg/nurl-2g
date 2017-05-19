@@ -26,9 +26,9 @@ DEFAULT_SETTINGS = [
         ('nurl.mongodb.db', str, 'nurl'),
         ('nurl.mongodb.data_col', str, 'urls'),
         ('nurl.mongodb.tracker_col', str,'accesses'),
-        ('nurl.whitelist_path', str, ''),
-        ('nurl.check_whitelist', asbool, False),
-        ('nurl.check_whitelist_auto_www', asbool, True),
+        ('nurl.whitelist.path', str, ''),
+        ('nurl.whitelist.enabled', asbool, False),
+        ('nurl.whitelist.auto_www', asbool, True),
         ('nurl.shortref_len', int, 6),
         ]
 
@@ -59,19 +59,18 @@ def includeme(config):
     mongodb_client = pymongo.MongoClient(mongodb_uri, appname='nURL')
     data_collection = mongodb_client[mongodb_name][mongodb_dscol]
     trac_collection = mongodb_client[mongodb_name][mongodb_trcol]
-    LOGGER.info('connected to MongoDB')
+    LOGGER.info('connecting to MongoDB instance "%s"', repr(mongodb_client))
 
-    if settings['nurl.check_whitelist']:
-        whitelist_path = settings['nurl.whitelist_path']
-        whitelist_auto_www = settings['nurl.check_whitelist_auto_www']
+    if settings['nurl.whitelist.enabled']:
+        whitelist_path = settings['nurl.whitelist.path']
+        whitelist_auto_www = settings['nurl.whitelist.auto_www']
         with open(whitelist_path) as wl_file:
             whitelist = get_whitelist(wl_file, whitelist_auto_www)
 
         # torna a lista disponível para a webapp
         config.registry.settings['nurl.whitelist'] = whitelist
 
-        LOGGER.info('using the whitelist at "%s"',
-                settings['nurl.whitelist_path'])
+        LOGGER.info('using the whitelist at "%s"', whitelist_path)
         LOGGER.info('whitelist auto-www is %s', 
                 'enabled' if whitelist_auto_www else 'disabled')
     else:
