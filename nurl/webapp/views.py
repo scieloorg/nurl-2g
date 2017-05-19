@@ -47,7 +47,7 @@ def url_shortener(request):
 
 @view_config(route_name='shortened')
 def short_ref_resolver(request):
-    access = Access(datetime=datetime.now(), referrer=request.referrer,
+    access = Access(datetime=datetime.utcnow(), referrer=request.referrer,
             browser=request.user_agent)
     try:
         plain_url = request.nurl.resolve(request.matchdict['short_ref'],
