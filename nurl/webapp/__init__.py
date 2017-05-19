@@ -40,19 +40,22 @@ def main(global_config, **settings):
     # mongodb client
     mongodb_uri = settings.get('mongodb.db_uri')
     mongodb_name = settings.get('mongodb.db_name')
-    mongodb_coln = settings.get('mongodb.col_name')
-    if not all([mongodb_uri, mongodb_name, mongodb_coln]):
+    mongodb_dscol = settings.get('mongodb.datastore_col_name')
+    mongodb_trcol = settings.get('mongodb.tracker_col_name')
+    if not all([mongodb_uri, mongodb_name, mongodb_dscol, mongodb_trcol]):
         sys.exit('Missing MongoDB configuration')
 
     mongodb_client = pymongo.MongoClient(mongodb_uri, appname='nURL')
-    mongodb_collection = mongodb_client[mongodb_name][mongodb_coln]
+    data_collection = mongodb_client[mongodb_name][mongodb_dscol]
+    trac_collection = mongodb_client[mongodb_name][mongodb_trcol]
     LOGGER.info('connected to MongoDB')
 
     # subscribers
     shortid_len = int(config.registry.settings.get('nurl.digit_count', 6))
     idgen = lambda: base28.igenerate_id(shortid_len)
-    access_tracker = trackers.InMemoryTracker()
-    datastore = datastores.MongoDBDataStore(mongodb_collection)
+    access_tracker = trackers.MongoDBTracker(trac_collection)
+    datastore = datastores.MongoDBDataStore(data_collection)
+
     nurl = shortener.Nurl(datastore, idgen, tracker=access_tracker)
     LOGGER.debug('using the nURL instance "%s"', repr(nurl))
 
