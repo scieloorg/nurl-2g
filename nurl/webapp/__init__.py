@@ -5,6 +5,7 @@ from pyramid.config import Configurator
 from pyramid_beaker import set_cache_regions_from_settings
 from pyramid.renderers import JSONP
 from pyramid.events import NewRequest
+from pyramid.settings import asbool
 import webassets
 import pymongo
 
@@ -50,13 +51,30 @@ def main(global_config, **settings):
     trac_collection = mongodb_client[mongodb_name][mongodb_trcol]
     LOGGER.info('connected to MongoDB')
 
+    if asbool(settings.get('nurl.check_whitelist', False)):
+        whitelist_path = config.registry.settings['nurl.whitelist_path']
+        whitelist_auto_www = asbool(
+                settings.get('nurl.check_whitelist_auto_www', False))
+        with open(whitelist_path) as wl_file:
+            whitelist = get_whitelist(wl_file, whitelist_auto_www)
+        config.registry.settings['nurl.whitelist'] = whitelist
+
+        LOGGER.info('using the whitelist at "%s"',
+                config.registry.settings['nurl.whitelist_path'])
+        LOGGER.info('whitelist auto-www is %s', 
+                'enabled' if whitelist_auto_www else 'disabled')
+    else:
+        LOGGER.info('whitelist of domain names is not being used')
+        whitelist = None
+
     # subscribers
     shortid_len = int(config.registry.settings.get('nurl.digit_count', 6))
     idgen = lambda: base28.igenerate_id(shortid_len)
     access_tracker = trackers.MongoDBTracker(trac_collection)
     datastore = datastores.MongoDBDataStore(data_collection)
 
-    nurl = shortener.Nurl(datastore, idgen, tracker=access_tracker)
+    nurl = shortener.Nurl(datastore, idgen, tracker=access_tracker, 
+            whitelist=whitelist)
     LOGGER.debug('using the nURL instance "%s"', repr(nurl))
 
     config.registry.settings['nurl'] = nurl
@@ -89,4 +107,16 @@ def add_access_tracker(event):
 def add_webassets_env(event):
     settings = event.request.registry.settings
     event.request.webassets_env = settings['webassets_env']
+
+
+def get_whitelist(whitelist, auto_www=False):
+    if auto_www:
+        hostnames = []
+        for host in whitelist:
+            hostnames.append(host.strip('\n'))
+            if not host.startswith('www'):
+                hostnames.append('www.' + host.strip('\n'))
+        return set(hostnames)
+    else:
+        return set((host.strip('\n') for host in whitelist))
 
