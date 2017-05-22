@@ -3,6 +3,7 @@ acordo com parâmetros fornecidos no arquivo de configurações do pyramid, e
 registra os pontos de acesso ``request.nurl`` e ``request.tracker`` para 
 serem utilizados em view-functions.
 """
+import os
 import sys
 import logging
 
@@ -22,23 +23,28 @@ LOGGER = logging.getLogger(__name__)
 
 
 DEFAULT_SETTINGS = [
-        ('nurl.mongodb.uri', str, 'mongodb://localhost:27017/'),
-        ('nurl.mongodb.db', str, 'nurl'),
-        ('nurl.mongodb.data_col', str, 'urls'),
-        ('nurl.mongodb.tracker_col', str,'accesses'),
-        ('nurl.whitelist.path', str, ''),
-        ('nurl.whitelist.enabled', asbool, False),
-        ('nurl.whitelist.auto_www', asbool, True),
-        ('nurl.shortref_len', int, 6),
+        ('nurl.mongodb.uri', 'NURL_MONGODB_URI', str, 'mongodb://localhost:27017/'),
+        ('nurl.mongodb.db', 'NURL_MONGODB_DB', str, 'nurl'),
+        ('nurl.mongodb.data_col', 'NURL_MONGODB_DATA_COL', str, 'urls'),
+        ('nurl.mongodb.tracker_col', 'NURL_MONGODB_DATA_COL', str,'accesses'),
+        ('nurl.whitelist.path', 'NURL_WHITELIST_PATH', str, ''),
+        ('nurl.whitelist.enabled', 'NURL_WHITELIST_ENABLED', asbool, False),
+        ('nurl.whitelist.auto_www', 'NURL_WHITELIST_AUTO_WWW', asbool, True),
+        ('nurl.shortref_len', 'NURL_SHORTREF_LEN', int, 6),
         ]
 
 
 def parse_settings(settings):
+    """Analisa e retorna as configurações da app com base no arquivo .ini e env.
+
+    As variáveis de ambiente possuem precedência em relação aos valores
+    definidos no arquivo .ini.
+    """
     parsed = {}
     cfg = list(DEFAULT_SETTINGS)
 
-    for name, convert, default in cfg:
-        value = settings.get(name, default)
+    for name, envkey, convert, default in cfg:
+        value = os.environ.get(envkey, settings.get(name, default))
         if convert is not None:
             value = convert(value)
         parsed[name] = value
