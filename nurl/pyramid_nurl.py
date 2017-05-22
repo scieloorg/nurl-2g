@@ -26,7 +26,7 @@ DEFAULT_SETTINGS = [
         ('nurl.mongodb.uri', 'NURL_MONGODB_URI', str, 'mongodb://localhost:27017/'),
         ('nurl.mongodb.db', 'NURL_MONGODB_DB', str, 'nurl'),
         ('nurl.mongodb.data_col', 'NURL_MONGODB_DATA_COL', str, 'urls'),
-        ('nurl.mongodb.tracker_col', 'NURL_MONGODB_DATA_COL', str,'accesses'),
+        ('nurl.mongodb.tracker_col', 'NURL_MONGODB_TRACKER_COL', str,'accesses'),
         ('nurl.whitelist.path', 'NURL_WHITELIST_PATH', str, ''),
         ('nurl.whitelist.enabled', 'NURL_WHITELIST_ENABLED', asbool, False),
         ('nurl.whitelist.auto_www', 'NURL_WHITELIST_AUTO_WWW', asbool, True),
