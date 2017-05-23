@@ -1,0 +1,21 @@
+version: '2'
+
+services:
+  mongodb:
+    image: mongo:3.4.4
+    ports:
+      - 27017
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+
+  webapp:
+    image: nurl
+    environment:
+      - NURL_MONGODB_URI=mongodb://mongodb:27017/
+    ports:
+      - 6543:6543
+    links:
+      - mongodb
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+
