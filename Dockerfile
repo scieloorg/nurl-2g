@@ -10,13 +10,15 @@ ENV IMAGE_BUILD_DATE ${BUILD_DATE}
 ENV IMAGE_VCS_REF ${VCS_REF}
 ENV IMAGE_WEBAPP_VERSION ${WEBAPP_VERSION}
 
-COPY . /app
-WORKDIR /app
+COPY requirements.txt production.ini whitelist.txt /app/
+COPY dist/* /tmp/pypa/
 
-RUN pip --no-cache-dir install -r requirements.txt && \
-    python setup.py install
+RUN pip --no-cache-dir install -r /app/requirements.txt && \
+    pip --no-cache-dir install -f file:///tmp/pypa -U nurl
 
-#USER nobody
+RUN rm -rf /tmp/pypa
+
+USER nobody
 EXPOSE 6543
 
 CMD gunicorn --paste /app/production.ini
