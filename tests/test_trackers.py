@@ -12,8 +12,8 @@ IS_RUNNING_ON_TRAVISCI = os.environ.get('TRAVIS', False)
 class InMemoryTests(unittest.TestCase):
     def setUp(self):
         self.tracker = trackers.InMemoryTracker()
-        self.access_sample = trackers.Access(datetime=datetime.utcnow(),
-                referrer='sample.com', browser='mozilla')
+        self.access_sample = trackers.Access(utctime=datetime.utcnow(),
+                referrer='sample.com')
 
     def test_add_new(self):
         self.tracker.add('foo', self.access_sample)
@@ -46,8 +46,8 @@ class MongoDBTests(unittest.TestCase):
         self.client = pymongo.MongoClient('127.0.0.1', 27017)
         self.collection = self.client['nurl_tests']['accesses']
         self.tracker = trackers.MongoDBTracker(self.collection)
-        self.access_sample = trackers.Access(datetime='20170519',
-                referrer='sample.com', browser='mozilla')
+        self.access_sample = trackers.Access(utctime='20170519',
+                referrer='sample.com')
 
     def tearDown(self):
         self.client.drop_database('nurl_tests')

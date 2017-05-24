@@ -16,7 +16,6 @@ def main(global_config, **settings):
     # URL patterns
     config.add_static_view('static', 'static', cache_max_age=3600)
     config.add_route('home', '/')
-    config.add_route('analytics', '/analytics/{short_ref}')
     config.add_route('shortened', '/{short_ref}')
 
     # restful endpoints
