@@ -6,5 +6,9 @@ build:
 
 build_image: clean build
 	@docker build -t nurl:latest .
+	@docker tag nurl scieloorg/nurl
 
-.PHONY: clean build build_image
+upload_image:
+	@docker push scieloorg/nurl
+
+.PHONY: clean build build_image upload_image
