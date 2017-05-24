@@ -62,8 +62,8 @@
         <div style="padding-left: 20px;">
           <p><strong>SciELO - Scientific Electronic Library Online <br/>
             <a href="http://www.fapesp.br" target="_blank">FAPESP</a> <a href="http://www.cnpq.br" target="_blank">CNPq</a> <a href="http://www.bireme.org">BIREME</a> <a href="http://www.fapunifesp.edu.br" target="_blank">FapUnifesp</a> </strong></p>
-          <p>Rua Machado Bittencourt, 430 - Vila Clementino  04044-001 São Paulo SP -   Brazil</p>
-          <p>Tel.: (55 11) 11 5083-3639 - Email: <a href="mailto:scielo@scielo.org">scielo@scielo.org</a>
+          <p>Avenida Onze de Junho, 269 - Vila Clementino  04041-050 São Paulo SP -   Brazil</p>
+          <p>Tel.: +55 (11) 5083-3639 - Email: <a href="mailto:scielo@scielo.org">scielo@scielo.org</a>
         </div>
       </div><!--Footer-->
       <div class="span2">
@@ -73,7 +73,7 @@
             <a href="http://docs.scielo.org/" target="_blank">Documentation</a>
           </li>
           <li>
-            <a href="https://github.com/scieloorg/nurl/issues/new">Report bug</a>
+            <a href="https://github.com/scieloorg/nurl-2g/issues/new">Report bug</a>
           </li>
           <li>
             <a href="http://groups.google.com/group/scielo-discuss" target="_blank">Discuss mailing list</a>
