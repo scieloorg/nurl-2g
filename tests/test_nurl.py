@@ -6,7 +6,7 @@ from nurl.shortener import (
         Nurl,
         NotExists,
         URLChecker,
-        SOCKET_TIMEOUT,
+        DEFAULT_TIMEOUT,
         )
 from nurl import datastores
 
@@ -87,7 +87,7 @@ class URLCheckerTests(unittest.TestCase):
         urlopen = nc.urllib_request.urlopen = mock.MagicMock(return_value='foo')
         nc.ping()
         urlopen.assert_called_once_with('http://www.scielo.br', 
-                timeout=SOCKET_TIMEOUT)
+                timeout=DEFAULT_TIMEOUT)
 
     def test_httperror_exc_makes_ping_return_false(self):
         import urllib.error
