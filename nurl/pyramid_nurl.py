@@ -31,6 +31,7 @@ DEFAULT_SETTINGS = [
         ('nurl.whitelist.enabled', 'NURL_WHITELIST_ENABLED', asbool, False),
         ('nurl.whitelist.auto_www', 'NURL_WHITELIST_AUTO_WWW', asbool, True),
         ('nurl.shortref_len', 'NURL_SHORTREF_LEN', int, 6),
+        ('nurl.ping_timeout', 'NURL_PING_TIMEOUT', int, 8),
         ]
 
 
@@ -88,9 +89,10 @@ def includeme(config):
     idgen = lambda: base28.igenerate_id(shortid_len)
     access_tracker = trackers.MongoDBTracker(trac_collection)
     datastore = datastores.MongoDBDataStore(data_collection)
+    ping_timeout = settings['nurl.ping_timeout']
 
     nurl = shortener.Nurl(datastore, idgen, tracker=access_tracker, 
-            whitelist=whitelist)
+            whitelist=whitelist, timeout=ping_timeout)
     LOGGER.debug('using the nURL instance "%s"', repr(nurl))
 
     config.registry.settings['nurl'] = nurl

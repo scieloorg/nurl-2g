@@ -16,7 +16,7 @@ __all__ = ['Nurl', 'URLError', 'NotExists']
 LOGGER = logging.getLogger(__name__)
 
 
-SOCKET_TIMEOUT = 3  # em segundos
+DEFAULT_TIMEOUT = 10  # segundos
 
 
 class URLError(Exception):
@@ -43,15 +43,19 @@ class Nurl:
                       hostnames permitidos de serem encurtados. O valor `None`
                       desliga o filtro.
     :param tracker: (opcional) instância de :class:`nurl.lib.trackers.Tracker`.
+    :param timeout: (opcional) tempo máximo, em segundos, para resposta do 
+                    ping.
     """
-    def __init__(self, store, idgen, whitelist=None, tracker=None):
+    def __init__(self, store, idgen, whitelist=None, tracker=None, 
+            timeout=DEFAULT_TIMEOUT):
         self.store = store
         self.idgen = idgen
         self.whitelist = set(whitelist) if whitelist else None
         self.tracker = tracker
+        self.timeout = timeout
 
     def shorten(self, url):
-        if not is_valid_url(url, self.whitelist):
+        if not is_valid_url(url, self.whitelist, self.timeout):
             raise URLError()
 
         for attempt, shortid in enumerate(self.idgen()):
@@ -86,10 +90,11 @@ class URLChecker:
     """
     urllib_request = urllib.request  # para facilitar os testes
 
-    def __init__(self, url, whitelist=None):
+    def __init__(self, url, whitelist=None, timeout=DEFAULT_TIMEOUT):
         self.url = url
         self.parsed_url = urllib.parse.urlparse(self.url)
         self.whitelist = whitelist
+        self.timeout = timeout
 
         if self.parsed_url.scheme not in ['http', 'https']:
             raise ValueError('missing URL schema')
@@ -107,7 +112,7 @@ class URLChecker:
         """Verifica se a URL alcança um servidor.
         """
         try:
-            _ = self.urllib_request.urlopen(self.url, timeout=SOCKET_TIMEOUT)
+            _ = self.urllib_request.urlopen(self.url, timeout=self.timeout)
         except (urllib.error.HTTPError, urllib.error.URLError,
                 socket.timeout) as exc:
             LOGGER.info('cannot connect to URL "%s": %s', self.url, str(exc))
@@ -116,11 +121,11 @@ class URLChecker:
             return True
 
 
-def is_valid_url(url, whitelist=None):
+def is_valid_url(url, whitelist=None, timeout=DEFAULT_TIMEOUT):
     """Verifica se `url` é válida.
     """
     try:
-        uc = URLChecker(url, whitelist)
+        uc = URLChecker(url, whitelist, timeout)
     except ValueError as exc:
         LOGGER.info('cannot check URL "%s": %s', url, str(exc))
         return False
