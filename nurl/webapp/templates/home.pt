@@ -13,7 +13,7 @@
     <div class="container">
 
       <div class="logo">
-        <img src="http://static.scielo.org/all/logos/scielo-140x148.png"/>
+          <img src="${request.static_url('nurl.webapp:static/scielo-140x148.png')}"/>
         <h2>The URL shortening tool for all SciELO resources.</h2>
       </div>
 
