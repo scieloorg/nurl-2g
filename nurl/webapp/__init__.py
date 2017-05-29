@@ -14,8 +14,7 @@ def main(global_config, **settings):
     config.add_renderer('jsonp', JSONP(param_name='callback'))
 
     # URL patterns
-    config.add_static_view(path='nurl.webapp:static',
-            name=config.registry.settings['nurl.webapp.media_url'], 
+    config.add_static_view(path='nurl.webapp:static', name='static',
             cache_max_age=3600)
     config.add_route('home', '/')
     config.add_route('shortened', '/{short_ref}')

@@ -1,4 +1,5 @@
 from datetime import datetime
+from urllib.parse import urlparse
 
 from pyramid.view import view_config
 from pyramid.response import Response
@@ -13,8 +14,14 @@ from nurl.trackers import Access
 
 @view_config(route_name='home', renderer='templates/home.pt')
 def home(request):
+    # a lista produzida pelo método `Bundle.urls()`, abaixo, contém URLs
+    # completas para os ativos estáticos. O hack abaixo pega apenas os segmentos
+    # path e query, para formar URLs relativas.
+    parsed_css_urls = [urlparse(url) 
+                       for url in request.webassets_env['css'].urls()]
+    css_paths = [url.path+'?'+url.query for url in parsed_css_urls]
 
-    response_dict = {'project':'nurl'}
+    response_dict = {'project':'nurl', 'css_paths': css_paths}
 
     incoming_url = request.params.get('url')
     if incoming_url is not None:
