@@ -31,6 +31,7 @@ DEFAULT_SETTINGS = [
         ('nurl.whitelist.enabled', 'NURL_WHITELIST_ENABLED', asbool, False),
         ('nurl.whitelist.auto_www', 'NURL_WHITELIST_AUTO_WWW', asbool, True),
         ('nurl.shortref_len', 'NURL_SHORTREF_LEN', int, 6),
+        ('nurl.webapp.media_url', 'NURL_WEBAPP_MEDIA_URL', str, 'static'),
         ]
 
 
